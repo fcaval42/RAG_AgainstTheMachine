@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/08 14:35:44 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/09 15:59:12 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/10 16:51:01 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -59,9 +59,21 @@ def chunk_python(file_path: str, content: str, max_size: int) -> List[Chunk]:
         else:
             end = len(content)
 
+        block = content[start:end]
+
+        if len(block) <= max:
+            chunks.append(file_path, start, end, block)
+        else:
+            #  bloc trop grand : on le redécoupe par paragraphes
+            big_chunk = chunk_text(file_path, block, max_size)
+            for (filepath, strt, ed, text) in big_chunk:
+                chunks.append(filepath, start + strt, start + ed, text)
+
+    return chunks
+
 
 #  Découpe texte en chunks en utilisant découpage par sections (car Markdown)
-# -> on empile plusieurs paragraphes tant que reste sous max_size = un chunk
+#  -> on empile plusieurs paragraphes tant que reste sous max_size = un chunk
 def chunk_text(file_path: str, content: str, max_size: int) -> List[Chunk]:
     chunks = []
     paragraphes = content.split("\n\n")
@@ -102,3 +114,7 @@ def chunk_choice(file_path: str, content: str, max_size: int) -> List[Chunk]:
         return chunk_python(file_path, content, max_size)
     else:
         return chunk_text(file_path, content, max_size)
+
+
+
+VOIR ERREUR 
