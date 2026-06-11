@@ -325,7 +325,7 @@ class GraniteReasoningParser(ReasoningParser):
             containing the reasoning content, the length of the response seq
             (if there is one) and the non-reasoning content.
         """
-        current_chunk_start = 0
+        current_start = 0
         start_reasoning_content = None
         parsed_content = False
         delimiter_idxs = [
@@ -333,28 +333,28 @@ class GraniteReasoningParser(ReasoningParser):
             if char == self.seq_boundary_end
         ]
 
-        for current_chunk_end in delimiter_idxs:
-            current_chunk = current_text[current_chunk_start:current_chunk_end]
+        for current_end in delimiter_idxs:
+            current = current_text[current_start:current_end]
             # Check to see if the start of reasoning seq if complete
             if start_reasoning_content is None:
                 for think_start in self.valid_think_starts:
-                    if current_chunk == think_start[:-1]:
-                        start_reasoning_content = current_chunk_end + 1
-                        current_chunk_start = current_chunk_end + 1
+                    if current == think_start[:-1]:
+                        start_reasoning_content = current_end + 1
+                        current_start = current_end + 1
                         break
 
             # Check to see if the start of response seq if complete
             elif not parsed_content:
                 for response_start in self.valid_response_starts:
-                    if current_chunk[-len(response_start) +
+                    if current[-len(response_start) +
                                      1:] == response_start[:-1]:
                         # Mark end of reasoning and start response content
                         # after the start of response sequence.
-                        end_reasoning_content = current_chunk_end - len(
+                        end_reasoning_content = current_end - len(
                             response_start)
                         reasoning_content = current_text[
                             start_reasoning_content:end_reasoning_content]
-                        response_content = current_text[current_chunk_end + 1:]
+                        response_content = current_text[current_end + 1:]
                         return reasoning_content, len(
                             response_start), response_content
 

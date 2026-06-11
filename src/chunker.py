@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/08 14:35:44 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/11 13:57:06 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/11 15:24:54 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -73,14 +73,40 @@ def chunk_python(file_path: str, content: str, max_size: int) -> List[Chunk]:
 
 
 #  Découpe texte en chunks en utilisant découpage par taille fixe.
-def chunk_text_size(file_path: str, content: list[str], max_size:
+def chunk_text_size(file_path: str, content: str, max_size:
                     int) -> List[Chunk]:
     chunks = []
 
     parts = content.splitlines(keepends=True)
+    print(f"\n\n{parts}\n\n")
 
-    
-    
+    current = ""
+    current_start = 0
+    position = 0
+
+    for part in parts:
+        # si nv chunk, current_start doit être la position
+        if not current:
+            current_start = position
+
+        # si ajout dépasse taille max, on ferme le chunk
+        if current and len(current) + len(part) > max_size:
+            chunks.append((file_path, current_start,
+                           current_start + len(current), current))
+            #  il faut repartir avec un chunk vide
+            current = part
+            current_start = position
+        else:
+            current += part
+
+        position += len(part)
+
+    # dernier chunk
+    if current:
+        chunks.append((file_path, current_start, current_start +
+                       len(current), current))
+        
+    return chunks
 
 
 #  Découpe texte en chunks en utilisant découpage par sections (car Markdown)
@@ -89,44 +115,44 @@ def chunk_text_markdown(file_path: str, paragraphes: list[str],
                         max_size: int) -> List[Chunk]:
     chunks = []
 
-    current_chunk = ""
-    current_start = 0
-    position = 0
+    current = ""        # texte accumulé pour le chunk en cours
+    current_start = 0   # index de début du chunk en cours
+    position = 0        # position dans content
 
     for para in paragraphes:
         #si ajouter le paragraphe dépasse la taille max, on ferme le chunk
-        if current_chunk and len(current_chunk) + 2 + len(para) > max_size:
-            end = current_start + len(current_chunk)
-            chunks.append((file_path, current_start, end, current_chunk))
+        if current and len(current) + 2 + len(para) > max_size:
+            end = current_start + len(current)
+            chunks.append((file_path, current_start, end, current))
 
             #nouveau chunk qui commence à la position courante
             current_start = position
-            current_chunk = para
+            current = para
 
         else:
-            if current_chunk:
-                current_chunk += "\n\n" + para
+            if current:
+                current += "\n\n" + para
             else:
-                current_chunk = para
+                current = para
 
         position += len(para) + 2    # +2 pour le "\n\n"
 
     #si dernier chunk non vide
-    if current_chunk.strip():
-        end = current_start + len(current_chunk)
-        chunks.append((file_path, current_start, end, current_chunk))
+    if current.strip():
+        end = current_start + len(current)
+        chunks.append((file_path, current_start, end, current))
 
     return chunks
 
 
 #  On choisit ici si on découpe le texte en fonction de paragraphes (\n\n) ou
 #  si pas de paragraphes = on découpe par taille fixe
-def chunk_text(file_path: str, content: str, max_size: int) -> None:
+def chunk_text(file_path: str, content: str, max_size: int) -> List[Chunk]:
     paragraphes = content.split("\n\n")
     if len(paragraphes) > 1:
-        chunk_text_markdown(file_path, paragraphes, max_size)
+        return chunk_text_markdown(file_path, paragraphes, max_size)
     else:
-        chunk_text_size(file_path, content, max_size)
+        return chunk_text_size(file_path, content, max_size)
 
 
 #  Entrée -> choisit stratégie chunking
@@ -144,7 +170,13 @@ def main():
     with open("tester.md", "r") as f:
         MARKDOWN_SAMPLE = f.read()
 
-    #print(chunk_choice("tester.py", PYTHON_SAMPLE, 80))
-    print(chunk_choice("tester.md", MARKDOWN_SAMPLE, 80))
+    #liste = chunk_choice("testerpy.py", PYTHON_SAMPLE, 2000)
+    liste2 = chunk_choice("tester.md", MARKDOWN_SAMPLE, 2000)
+
+    #for lst in liste:
+    #    print(f"\n\n{lst}\n\n")
+
+    for lste in liste2:
+        print(f"\n\n{lste}\n\n")
 
 main()

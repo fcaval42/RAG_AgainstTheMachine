@@ -126,7 +126,7 @@ def test_chunk():
     assert out.num_batched_tokens == 57
 
 
-def test_concurrent_chunking():
+def test_concurrenting():
     """Verify prefills are chunked properly when 
     --max-num-partial-prefills is > 1"""
     block_size = 4
@@ -172,7 +172,7 @@ def test_concurrent_chunking():
     assert out.num_batched_tokens == 56
 
 
-def test_concurrent_chunking_large_requests():
+def test_concurrenting_large_requests():
     """Verify large prefill requests are run one at a time"""
     block_size = 4
     max_seqs = 60
