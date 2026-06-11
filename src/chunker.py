@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/08 14:35:44 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/11 15:24:54 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/11 15:38:56 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -158,25 +158,30 @@ def chunk_text(file_path: str, content: str, max_size: int) -> List[Chunk]:
 #  Entrée -> choisit stratégie chunking
 def chunk_choice(file_path: str, content: str, max_size: int) -> List[Chunk]:
     if file_path.lower().endswith(".py"):
+        #print("\n\nJE PASSE ICI : CHUNK PYTHON\n\n")
         return chunk_python(file_path, content, max_size)
-    else:
-        return chunk_text(file_path, content, max_size)
+    if file_path.lower().endswith(".md"):
+        #print("\n\nJE PASSE ICI : MARKDOWN\n\n")
+        paragraphes = content.split("\n\n")
+        return chunk_text_markdown(file_path, paragraphes, max_size)
+    #print("\n\nJE PASSE ICI : TEXT\n\n")
+    return chunk_text(file_path, content, max_size)
 
 
-def main():
-    with open("testerpy.py", "r") as f:
-        PYTHON_SAMPLE = f.read()
+#def main():
+#    with open("testerpy.py", "r") as f:
+#        PYTHON_SAMPLE = f.read()
 
-    with open("tester.md", "r") as f:
-        MARKDOWN_SAMPLE = f.read()
+#    with open("tester.txt", "r") as f:
+#        MARKDOWN_SAMPLE = f.read()
 
-    #liste = chunk_choice("testerpy.py", PYTHON_SAMPLE, 2000)
-    liste2 = chunk_choice("tester.md", MARKDOWN_SAMPLE, 2000)
+#    #liste = chunk_choice("testerpy.py", PYTHON_SAMPLE, 2000)
+#    liste2 = chunk_choice("tester.txt", MARKDOWN_SAMPLE, 2000)
 
-    #for lst in liste:
-    #    print(f"\n\n{lst}\n\n")
+#    #for lst in liste:
+#    #    print(f"\n\n{lst}\n\n")
 
-    for lste in liste2:
-        print(f"\n\n{lste}\n\n")
+#    for lste in liste2:
+#        print(f"\n\n{lste}\n\n")
 
-main()
+#main()
