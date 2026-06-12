@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/11 16:50:18 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/12 16:11:26 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/12 16:20:55 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -74,6 +74,34 @@ def extract_vllm(direction: str = "data/raw") -> str:
 
 #    return files
 
+
+Cette ligne de code sert à filtrer et ignorer les fichiers ou dossiers cachés et inutiles du dépôt 
+vLLM pour éviter de polluer votre index de recherche.  C'est une excellente '
+'sécurité pour votre projet. Décomposons son fonctionnement :1. path.parts '
+'(Le découpage du chemin)La propriété .parts (fournie par pathlib) découpe '
+'le chemin complet d'un fichier en une liste contenant chaque dossier et le 
+nom du fichier.Si le chemin est : 
+data/raw/vllm-0.10.1/.github/workflows/ci.ymlpath.parts va renvoyer : 
+('data', 'raw', 'vllm-0.10.1', '.github', 'workflows', 'ci.yml')2. 
+part.startswith(".") (Détecter le caché)En informatique (particulièrement 
+                                                         sous Linux/macOS), 
+tout fichier ou dossier dont le nom commence par un point est caché (ex: .git, 
+.github, .vscode, .gitignore).
+Ces dossiers contiennent des configurations ou l'historique Git, et non du'
+' code source ou de la documentation vLLM utile à indexer.  3. part in '
+'IGNORED_DIRS (Détecter les dossiers exclus)Cela vérifie si l'un des 
+morceaux du chemin se trouve dans une liste personnalisée de dossiers à 
+bannir (que vous devez définir plus haut dans votre code, par exemple : 
+        IGNORED_DIRS = ["__pycache__", "node_modules", "build"]).4. 
+Le any(...) (La condition globale)La fonction any() renvoie True si au 
+moins un des éléments de la boucle respecte l'une des conditions.'
+'En résuméCette ligne dit à Python :"Regarde chaque dossier qui compose'
+' le chemin de ce fichier. Si l'un de ces dossiers commence par un point 
+(dossier caché) ou s'appelle comme un dossier à ignorer (comme __pycache__), '
+'alors renvoie True."Dans votre code, vous l'utiliserez généralement avec un 
+continue pour passer directement au fichier suivant sans le découper en chunks
+:
+
 #
 def load_files(path_dir: str) -> List[Tuple[str, str]]:
     files = []
@@ -85,7 +113,7 @@ def load_files(path_dir: str) -> List[Tuple[str, str]]:
         if not path.is_file():
             continue
 
-        
+        CONTINUER A VOIR POUR LOAD LES FICHIERS 
 
 
 # Main/Pipeline du fichier
