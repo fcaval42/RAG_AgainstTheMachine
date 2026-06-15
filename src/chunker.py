@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/08 14:35:44 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/11 16:37:55 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/15 14:45:38 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -78,7 +78,7 @@ def chunk_text_size(file_path: str, content: str, max_size:
     chunks = []
 
     parts = content.splitlines(keepends=True)
-    print(f"\n\n{parts}\n\n")
+    #print(f"\n\n{parts}\n\n")
 
     current = ""
     current_start = 0
