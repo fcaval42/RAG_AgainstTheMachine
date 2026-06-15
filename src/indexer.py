@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/11 16:50:18 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/15 15:33:19 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/15 15:34:01 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -177,5 +177,5 @@ def main_indexer(path_dir: str = "../vllm-0.10.1",
           "the data/processed/ directory")
 
 
-if __name__ == "__main__":
-    main_indexer("vllm-0.10.1")
+#if __name__ == "__main__":
+#    main_indexer("vllm-0.10.1")

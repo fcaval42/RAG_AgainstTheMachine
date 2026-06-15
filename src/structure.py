@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/08 13:53:11 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/08 14:34:40 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/15 15:50:03 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -20,7 +20,6 @@ class MinimalSource(BaseModel):
     file_path: str                  #chemin du fichier
     first_character_index: int      #où commence le chunk dans le fichier
     last_character_index: int       #où il finit
-
 
 
 #  Question sans réponse (juste la question + un id unique  #
