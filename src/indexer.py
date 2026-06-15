@@ -6,18 +6,23 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/11 16:50:18 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/12 16:20:55 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/15 12:01:19 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
 import os
 import sys
 import zipfile
+from tqdm import tqdm
+import bm25s
 from pathlib import Path
 from typing import List, Tuple
+from src.chunker import chunk_choice, Chunk
+
 
 #  Fichiers qu'on ignore
 IGNORED_DIRS = {"__pycache__", "node_modules"}
+
 
 #  Chemins de sauvegarde de l'index demandé par le sujet
 INDEX_DIR = "data/processed"
@@ -53,67 +58,38 @@ def extract_vllm(direction: str = "data/raw") -> str:
     return extracted_path
 
 
-
-#def load_files():
-#    files = []
-
-#    for path in REPO_PATH.rglob("*"):
-#        if not path.is_file():
-#            continue
-#        if any(part.startswith(".") or part in IGNORED_DIRS for part in path.parts):
-#            continue
-#        if path.suffix.lower() not in SUPPORTED_EXTENSIONS:
-#            continue
-
-#        try:
-#            content = path.read_text(encoding="utf-8", errors="ignore")
-#            rel_path = os.path.relpath(path)  # garde le même comportement que ton code actuel
-#            files.append((rel_path, content))
-#        except Exception as e:
-#            print(f"  Impossible de lire {path}: {e}")
-
-#    return files
-
-
-Cette ligne de code sert à filtrer et ignorer les fichiers ou dossiers cachés et inutiles du dépôt 
-vLLM pour éviter de polluer votre index de recherche.  C'est une excellente '
-'sécurité pour votre projet. Décomposons son fonctionnement :1. path.parts '
-'(Le découpage du chemin)La propriété .parts (fournie par pathlib) découpe '
-'le chemin complet d'un fichier en une liste contenant chaque dossier et le 
-nom du fichier.Si le chemin est : 
-data/raw/vllm-0.10.1/.github/workflows/ci.ymlpath.parts va renvoyer : 
-('data', 'raw', 'vllm-0.10.1', '.github', 'workflows', 'ci.yml')2. 
-part.startswith(".") (Détecter le caché)En informatique (particulièrement 
-                                                         sous Linux/macOS), 
-tout fichier ou dossier dont le nom commence par un point est caché (ex: .git, 
-.github, .vscode, .gitignore).
-Ces dossiers contiennent des configurations ou l'historique Git, et non du'
-' code source ou de la documentation vLLM utile à indexer.  3. part in '
-'IGNORED_DIRS (Détecter les dossiers exclus)Cela vérifie si l'un des 
-morceaux du chemin se trouve dans une liste personnalisée de dossiers à 
-bannir (que vous devez définir plus haut dans votre code, par exemple : 
-        IGNORED_DIRS = ["__pycache__", "node_modules", "build"]).4. 
-Le any(...) (La condition globale)La fonction any() renvoie True si au 
-moins un des éléments de la boucle respecte l'une des conditions.'
-'En résuméCette ligne dit à Python :"Regarde chaque dossier qui compose'
-' le chemin de ce fichier. Si l'un de ces dossiers commence par un point 
-(dossier caché) ou s'appelle comme un dossier à ignorer (comme __pycache__), '
-'alors renvoie True."Dans votre code, vous l'utiliserez généralement avec un 
-continue pour passer directement au fichier suivant sans le découper en chunks
-:
-
-#
+# Retourne fichiers supportés
 def load_files(path_dir: str) -> List[Tuple[str, str]]:
     files = []
 
-    # path = devient objet content fichier trouvé
+    # path = devient objet contenant fichier trouvé
     for path in Path(path_dir).rglob("*"):
 
         # traiter que les fichiers
         if not path.is_file():
             continue
 
-        CONTINUER A VOIR POUR LOAD LES FICHIERS 
+        # vérifie fichiers cachés ou si on veut l'ignorer
+        for part in path.parts:
+            if any(part.startswith(".") or part in IGNORED_DIRS):
+                continue
+
+        try:
+            # errors -> si caractères bizarres ou pas purement textuel
+            with open(path, 'r', encoding='utf-8', errors="ignore") as file:
+                content = file.read()
+
+            #  On construit le chemin relatif depuis la racine du projet
+            # (data/raw/...) car c'est ce que la moulinette utilise pour
+            # comparer
+            relatif_path = os.path.relpath(path)
+
+            files.append((relatif_path, content))
+
+        except Exception as e:
+            print(f"Unreadable {relatif_path}: {e}")
+
+    return files
 
 
 # Main/Pipeline du fichier
@@ -128,6 +104,22 @@ def main_indexer(path_dir: str = "../vllm-0.10.1",
         print("[ERROR] You don't have permission to access in "
               f"{CHUNKS_PATH}: {e}")
 
+    # on load les fichiers
     print(f"Reading files in {path_dir}...")
     files = load_files(path_dir)
     print(f"   {len(files)} files found")
+
+    # Découpage en chunks de tous les fichiers
+    all_chunks = []
+    for file_path, content in tqdm(files, desc="Chunking"):
+        chunks = chunk_choice(file_path, content, max_chunk_size)
+        all_chunks.extend(chunks)
+
+    print(f"{len(all_chunks)}: Total number of chunks created")
+
+    # BM25 tokenise les textes
+    # on va chercher le 4eme élément du tuple qui correspond au contenu texte
+    # stopwords="en" -> ignore mots fréquents qui servent à r (the, a, is...)
+    chunks_text = [chunk[3] for chunk in all_chunks]
+    print("Corpus tokenization...")
+    tokenized_text = bm25s.tokenize(chunks_text, stopwords="en")
