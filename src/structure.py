@@ -6,20 +6,20 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/08 13:53:11 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/16 10:13:43 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/16 17:50:33 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
 from typing import List
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 #   Représente un morceau de fichier récupéré (chemin +     #
 #       position dans le fichier)                           #
 class MinimalSource(BaseModel):
-    file_path: str                  #chemin du fichier
-    first_character_index: int      #où commence le chunk dans le fichier
-    last_character_index: int       #où il finit
+    file_path: str                  # chemin du fichier
+    first_character_index: int      # où commence le chunk dans le fichier
+    last_character_index: int       # où il finit
 
 
 #  Question sans réponse (juste la question + un id unique  #

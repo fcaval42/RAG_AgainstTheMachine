@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/16 11:15:18 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/16 17:12:38 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/16 17:43:42 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -28,7 +28,7 @@ def load_llm() -> None:
     if _cache_pipeline is not None:
         return
 
-    print(f"Loading model: Qwen/Qwen3-0.6B")
+    print("Loading model: Qwen/Qwen3-0.6B")
 
     # pipeline fais 3 étapes = tokenizer -> modèle -> detokenizer
     try:
@@ -46,8 +46,8 @@ def read_chunk(source: MinimalSource) -> str:
         with open(source.file_path, "r", encoding="utf-8",
                   errors="ignore") as f:
             content = f.read()
-        return content[source.first_character_index:\
-                       source.last_character_index]
+        return content[
+            source.first_character_index:source.last_character_index]
     except Exception:
         # si fichier existe plus on ignore le chunk
         return ""
@@ -68,7 +68,7 @@ def build_prompt(question: str, sources: List[MinimalSource]) -> str:
             continue
         if len(chunk_text) > budget:
             chunk_text = chunk_text[:budget]
-            #on source pour LLM puisse citer ses sources dans sa réponse
+            # on source pour LLM puisse citer ses sources dans sa réponse
             context_parts.append(f"[Source: {src.file_path}]\n{chunk_text}"
                                  "(truncated...)")
             break

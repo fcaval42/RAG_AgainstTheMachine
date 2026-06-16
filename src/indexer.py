@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/11 16:50:18 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/15 15:34:01 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/16 17:44:16 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -35,11 +35,11 @@ CHUNKS_PATH = os.path.join(INDEX_DIR, "chunks", "chunks.pkl")
 def load_index() -> Tuple[bm25s.BM25, List[Tuple[str, int, int]]]:
     if not os.path.exists(BM25_PATH):
         raise FileNotFoundError("Index BM25 not found. First run:\n"
-            "  uv run python -m student index")
+                                "  uv run python -m student index")
 
     if not os.path.exists(CHUNKS_PATH):
         raise FileNotFoundError("Chunk metadata not found. Retrying:\n"
-            "  uv run python -m student index")
+                                "  uv run python -m student index")
 
     # chargement index BM25 (load_corpus=False car on a pas besoin de
     # recharger le texte vu qu'on l'a déjà, tu captes ?)
@@ -177,5 +177,5 @@ def main_indexer(path_dir: str = "../vllm-0.10.1",
           "the data/processed/ directory")
 
 
-#if __name__ == "__main__":
+# if __name__ == "__main__":
 #    main_indexer("vllm-0.10.1")

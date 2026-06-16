@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/08 14:35:44 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/15 14:45:38 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/16 17:42:54 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -14,21 +14,21 @@ import ast
 from typing import List, Tuple
 
 
-#  Chunk = (chemin du fichier, index début, index fin, texte du chunk)
+# Chunk = (chemin du fichier, index début, index fin, texte du chunk)
 Chunk = Tuple[str, int, int, str]
 
 
-#  Découpe fichier Python en chunks par fonctions et classes
+# Découpe fichier Python en chunks par fonctions et classes
 def chunk_python(file_path: str, content: str, max_size: int) -> List[Chunk]:
     chunks = []
 
     try:
         tree = ast.parse(content)
     except SyntaxError:
-        #si fichier écrit bizarrement etc, on découpe en mode texte
+        # si fichier écrit bizarrement etc, on découpe en mode texte
         return chunk_text(file_path, content, max_size)
 
-    #calcul des positions de chaque début de ligne pour convertir en AST
+    # calcul des positions de chaque début de ligne pour convertir en AST
     lines = content.split("\n")
     line_start = []
     position = 0
@@ -78,7 +78,7 @@ def chunk_text_size(file_path: str, content: str, max_size:
     chunks = []
 
     parts = content.splitlines(keepends=True)
-    #print(f"\n\n{parts}\n\n")
+    # print(f"\n\n{parts}\n\n")
 
     current = ""
     current_start = 0
@@ -105,7 +105,7 @@ def chunk_text_size(file_path: str, content: str, max_size:
     if current:
         chunks.append((file_path, current_start, current_start +
                        len(current), current))
-        
+
     return chunks
 
 
@@ -120,12 +120,12 @@ def chunk_text_markdown(file_path: str, paragraphes: list[str],
     position = 0        # position dans content
 
     for para in paragraphes:
-        #si ajouter le paragraphe dépasse la taille max, on ferme le chunk
+        # si ajouter le paragraphe dépasse la taille max, on ferme le chunk
         if current and len(current) + 2 + len(para) > max_size:
             end = current_start + len(current)
             chunks.append((file_path, current_start, end, current))
 
-            #nouveau chunk qui commence à la position courante
+            # nouveau chunk qui commence à la position courante
             current_start = position
             current = para
 
@@ -137,7 +137,7 @@ def chunk_text_markdown(file_path: str, paragraphes: list[str],
 
         position += len(para) + 2    # +2 pour le "\n\n"
 
-    #si dernier chunk non vide
+    # si dernier chunk non vide
     if current.strip():
         end = current_start + len(current)
         chunks.append((file_path, current_start, end, current))
@@ -158,17 +158,17 @@ def chunk_text(file_path: str, content: str, max_size: int) -> List[Chunk]:
 #  Entrée -> choisit stratégie chunking
 def chunk_choice(file_path: str, content: str, max_size: int) -> List[Chunk]:
     if file_path.lower().endswith(".py"):
-        #print("\n\nJE PASSE ICI : CHUNK PYTHON\n\n")
+        # print("\n\nJE PASSE ICI : CHUNK PYTHON\n\n")
         return chunk_python(file_path, content, max_size)
     if file_path.lower().endswith(".md"):
-        #print("\n\nJE PASSE ICI : MARKDOWN\n\n")
+        # print("\n\nJE PASSE ICI : MARKDOWN\n\n")
         paragraphes = content.split("\n\n")
         return chunk_text_markdown(file_path, paragraphes, max_size)
-    #print("\n\nJE PASSE ICI : TEXT\n\n")
+    # print("\n\nJE PASSE ICI : TEXT\n\n")
     return chunk_text(file_path, content, max_size)
 
 
-#def main():
+# def main():
 #    with open("testerpy.py", "r") as f:
 #        PYTHON_SAMPLE = f.read()
 
@@ -184,4 +184,4 @@ def chunk_choice(file_path: str, content: str, max_size: int) -> List[Chunk]:
 #    for lste in liste2:
 #        print(f"\n\n{lste}\n\n")
 
-#main()
+# main()

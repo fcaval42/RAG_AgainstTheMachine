@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/15 15:36:23 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/16 11:03:26 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/16 17:49:59 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -33,12 +33,12 @@ def search(request: List[str], retriever: bm25s.BM25, chunk_metadata:
 
     all_sources = []
     for request_result in results:
-       sources = []
-       for idx in request_result:
+        sources = []
+        for idx in request_result:
             file_path, start, end = chunk_metadata[int(idx)]
             sources.append(MinimalSource(file_path=file_path,
                                          first_character_index=start,
                                          last_character_index=end))
-       all_sources.append(sources)
 
-       return all_sources
+    all_sources.append(sources)
+    return all_sources
