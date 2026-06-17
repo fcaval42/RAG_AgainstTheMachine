@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/08 13:43:02 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/17 17:09:03 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/17 17:23:03 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -145,9 +145,19 @@ class RAGSystem():
         print(f"Saved student_search_results to {save_path}")
 
 
-
     # génère réponses pour toutes les questions d'un fichier de resultats
-    # = 
+    # = prend fichier JSON, lit les chunks trouvés et utilise le LLM pour
+    # répondre à la chaîne
+    def answer_dataset(self, student_search_results_path: str,
+                       save_directory: str = \
+                        "data/output/search_results_and_answer") -> None:
+
+        if not os.path.exists(student_search_results_path):
+            print("\n" + ERROR + ": dataset not "
+                  f"found ({student_search_results_path})")
+            sys.exit()
+
+        continuer ici
 
 
 
