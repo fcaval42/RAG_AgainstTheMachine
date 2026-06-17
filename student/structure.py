@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/08 13:53:11 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/16 17:50:33 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/17 14:33:21 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -39,10 +39,10 @@ class RagDataset(BaseModel):
     rag_questions: List[AnsweredQuestion | UnansweredQuestion]
 
 
-#   #
+#  Le retriever met les meilleurs chunks et la question dedans #
 class MinimalSearchResults(BaseModel):
     question_id: str
-    question: str
+    question_str: str
     retrieved_sources: List[MinimalSource]
 
 

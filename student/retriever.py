@@ -6,19 +6,19 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/15 15:36:23 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/16 17:49:59 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/17 14:28:47 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
 import bm25s
 from typing import List, Tuple
-from src.structure import MinimalSource
+from student.structure import MinimalSource
 
 
 #  cherche les k chunks, pour une seule question, donc on refait la même pour
 #  request que ce qu'on a fait pour indexer
 def search(request: List[str], retriever: bm25s.BM25, chunk_metadata:
-           List[Tuple[str, int, int]], k: int = 5) -> List[MinimalSource]:
+           List[Tuple[str, int, int]], k: int) -> List[MinimalSource]:
 
     # mettre faux show parce que sinon on va avoir une barre de progression
     tokenized_request = bm25s.tokenize(request, stopwords="en",

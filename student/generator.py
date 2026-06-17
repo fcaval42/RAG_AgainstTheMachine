@@ -6,14 +6,14 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/16 11:15:18 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/16 17:43:42 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/17 14:59:18 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
 import sys
 from typing import List
 from transformers import pipeline
-from src.structure import MinimalSource
+from student.structure import MinimalSource
 
 # on garde le modèle en mémoire entre les appels pour éviter de recharger
 # à chaque fois (voir principe singleton)

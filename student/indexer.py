@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/11 16:50:18 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/16 17:44:16 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/17 14:14:27 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -18,7 +18,7 @@ import zipfile
 from tqdm import tqdm
 from pathlib import Path
 from typing import List, Tuple
-from src.chunker import chunk_choice
+from student.chunker import chunk_choice
 
 
 #  Fichiers qu'on ignore
@@ -116,8 +116,7 @@ def load_files(path_dir: str) -> List[Tuple[str, str]]:
 
 
 # Main/Pipeline du fichier
-def main_indexer(path_dir: str = "../vllm-0.10.1",
-                 max_chunk_size: int = 2000) -> None:
+def main_indexer(path_dir: str, max_chunk_size: int) -> None:
 
     # extraction zip si besoin
     try:
@@ -166,10 +165,10 @@ def main_indexer(path_dir: str = "../vllm-0.10.1",
             pickle.dump(chunk_metadata, f)
         print(f"  Metadata chunks saved in {CHUNKS_PATH}")
     except pickle.PicklingError:
-        print("[ERROR] : Unable to serialize the chunk metadata.")
+        print("Unable to serialize the chunk metadata.")
         sys.exit()
     except FileNotFoundError:
-        print(f"[ERROR] The destination folder for {CHUNKS_PATH} does "
+        print(f"The destination folder for {CHUNKS_PATH} does "
               "not exist.")
         sys.exit()
 
