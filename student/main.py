@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/08 13:43:02 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/18 13:36:45 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/18 16:45:11 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -34,9 +34,9 @@ class RAGSystem():
               max_chunk_size: int = 2000) -> None:
 
         try:
-            main_indexer(repo_path=repo_path, max_chunk_size=max_chunk_size)
+            main_indexer(repo_path, max_chunk_size)
         except Exception as e:
-            print("\n" + ERROR + f"{e}\n")
+            print("\n" + ERROR + f" {e}\n")
             sys.exit()
 
 
@@ -61,7 +61,9 @@ class RAGSystem():
             question_str=request, retrieved_sources=sources)
 
         # on peut utiliser direct la méthode json car pydantic v2
+        print("\n" + " Result of search ".center(70, "°") + "\n")
         print(result.model_dump_json(indent=2))
+        print(" OK search ".center(70, "°") + "\n")
 
 
     # répond à la question en récupérant le contexte puis en générant réponse
@@ -116,16 +118,17 @@ class RAGSystem():
         dataset = RagDataset.model_validate(raw)
 
         questions = dataset.rag_questions
-        print(f"Processing {len(questions)} questions...")
+        print("\n" + f"  ❓ Processing {len(questions)} questions...")
 
         # on extrait toutes les questions pour le batch
         requests_text = [q.question for q in questions]
 
-        print("BM25 Search in Progress...")
+        print("  🔍 ​BM25 Search in Progress...")
         all_sources = search(requests_text, retriever, chunk_metadata, k=k)
 
         all_results = []
-        for question, sources in tqdm(zip(questions, all_sources),
+        print("\n")
+        for question, sources in tqdm.tqdm(zip(questions, all_sources),
                                           total=len(questions),
                                           desc="Formatting the results"):
             all_results.append(MinimalSearchResults(
@@ -143,7 +146,8 @@ class RAGSystem():
         with open(save_path, "w", encoding="utf-8") as f:
             f.write(output.model_dump_json(indent=2))
 
-        print(f"Saved student_search_results to {save_path}")
+        print("\n" + "✅​ Saved student_search_results to "
+              f"{save_path}".center(100, " ") + "\n")
 
 
     # génère réponses pour toutes les questions d'un fichier de resultats
@@ -166,7 +170,7 @@ class RAGSystem():
         print(f"Loaded {total} questions from {student_search_results_path}")
 
         all_answers = []
-        for i, result in enumerate(tqdm(
+        for i, result in enumerate(tqdm.tqdm(
             search_results.search_results, desc="Generating answers")):
             answer_text = generate_answer(
                 result.question_str, result.retrieved_sources)
@@ -188,7 +192,8 @@ class RAGSystem():
         with open(save_path, 'w', encoding='utf-8') as f:
             f.write(output.model_dump_json(indent=2))
 
-        print(f"Saved student_search_results_and_answer to {save_path}")
+        print("\n" + "✅​ Saved student_search_results_and_answer "
+              f"to {save_path}".center(120, " ") + "\n")
 
 
     # Evalue résultats de recherche avec la métrique recall@k.
@@ -198,6 +203,8 @@ class RAGSystem():
     # liste pour ne garder que les 5 premiers.
     def evaluate(self, student_answer_path: str, dataset_path: str,
                  k: int = 10, max_context_length : int = 2000) -> None:
+        
+        print("\n" + " EVALUATE ".center(70, "~") + "\n")
 
         if not os.path.exists(student_answer_path):
             print("\n" + ERROR + f"{student_answer_path} not found\n")
@@ -222,7 +229,7 @@ class RAGSystem():
         gt_by_id = {}
         for q in gt_dataset.rag_questions:
             if isinstance(q, AnsweredQuestion):
-                gt_by_id[q.question] = q.sources
+                gt_by_id[q.question_id] = q.sources
 
         # stocke les notes de Recall obtenues pour chaque question.
         # à la fin on fera la moyenne de ces listes pour obtenir le score
@@ -254,6 +261,17 @@ class RAGSystem():
                 score = found / len(gt_src) if gt_src else 0.0
 
                 recall_scores[k_val].append(score)
+
+            # permet évaluer combien de questions ont été évaluées
+            # 1 = si liste pas vide sinon on prend la valeur 1
+            n = len(recall_scores[1]) if recall_scores[1] else 1
+
+            print("\n👨‍🎓 Student data is valid: True")
+            print(f"  Total number of questions: {len(
+                student_results.search_results)}")
+            print(f"  Total number")
+
+            CONTINUER ICI
 
 
 # lance le CLI avec Python Fire

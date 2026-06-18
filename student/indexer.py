@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/11 16:50:18 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/17 14:14:27 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/18 14:19:16 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -118,6 +118,8 @@ def load_files(path_dir: str) -> List[Tuple[str, str]]:
 # Main/Pipeline du fichier
 def main_indexer(path_dir: str, max_chunk_size: int) -> None:
 
+    print("\n" + "\n" + "INDEXER".center(70, "-"))
+
     # extraction zip si besoin
     try:
         os.makedirs(BM25_PATH, exist_ok=True)
@@ -128,34 +130,34 @@ def main_indexer(path_dir: str, max_chunk_size: int) -> None:
         sys.exit()
 
     # on load les fichiers
-    print(f"Reading files in {path_dir}...")
+    print(f"\n📖​ Reading files in {path_dir}...")
     files = load_files(path_dir)
-    print(f"   {len(files)} files found")
+    print(f"     {len(files)} files found")
 
     # Découpage en chunks de tous les fichiers
     all_chunks = []
-    for file_path, content in tqdm(files, desc="Chunking"):
+    for file_path, content in tqdm(files, desc="\nChunking"):
         chunks = chunk_choice(file_path, content, max_chunk_size)
         all_chunks.extend(chunks)
 
-    print(f"{len(all_chunks)}: Total number of chunks created")
+    print(f"     {len(all_chunks)}: Total number of chunks created")
 
     # BM25 tokenise les textes
     # on va chercher le 4eme élément du tuple qui correspond au contenu texte
     # stopwords="en" -> ignore mots fréquents qui servent à r (the, a, is...)
     chunks_text = [chunk[3] for chunk in all_chunks]
-    print("Corpus tokenization...")
+    print("\n🖥️​ Corpus tokenization...")
     tokenized_text = bm25s.tokenize(chunks_text, stopwords="en")
 
     # Construction index BM25 sur texte tokenisé et nettoyé
-    print("Construction of the BM25 Index...")
+    print("\n📚 Construction of the BM25 Index...")
     retriever = bm25s.BM25()
     retriever.index(tokenized_text)
 
     # sauvegarde de l'index BM25 sur disque (pour pouvoir le recharger sans
     # recalculer)
     retriever.save(BM25_PATH)
-    print(f"  BM25 index saved in {BM25_PATH}")
+    print(f"     💾 BM25 index saved in {BM25_PATH}")
 
     # on sauvegarde les métadonnées des chunks séparément (file_path +
     # position). Pas besoin de stocker
@@ -163,7 +165,7 @@ def main_indexer(path_dir: str, max_chunk_size: int) -> None:
     try:
         with open(CHUNKS_PATH, "wb") as f:
             pickle.dump(chunk_metadata, f)
-        print(f"  Metadata chunks saved in {CHUNKS_PATH}")
+        print(f"     💾 Metadata chunks saved in {CHUNKS_PATH}")
     except pickle.PicklingError:
         print("Unable to serialize the chunk metadata.")
         sys.exit()
@@ -172,8 +174,8 @@ def main_indexer(path_dir: str, max_chunk_size: int) -> None:
               "not exist.")
         sys.exit()
 
-    print("\nIngestion complete! The indexes have been saved to "
-          "the data/processed/ directory")
+    print("\n" + "Ingestion complete! The indexes have been saved to "
+          "the data/processed/directory".center(80, " ") + "\n")
 
 
 # if __name__ == "__main__":

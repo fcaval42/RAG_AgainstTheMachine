@@ -6,13 +6,14 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/16 11:15:18 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/17 14:59:18 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/18 14:54:55 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
+import re
 import sys
 from typing import List
-from transformers import pipeline
+from transformers import pipeline, GenerationConfig
 from student.structure import MinimalSource
 
 # on garde le modèle en mémoire entre les appels pour éviter de recharger
@@ -28,7 +29,7 @@ def load_llm() -> None:
     if _cache_pipeline is not None:
         return
 
-    print("Loading model: Qwen/Qwen3-0.6B")
+    print("\n" + "🚀​ Loading model: Qwen/Qwen3-0.6B" + "\n")
 
     # pipeline fais 3 étapes = tokenizer -> modèle -> detokenizer
     try:
@@ -37,7 +38,7 @@ def load_llm() -> None:
         print(f"[ERROR] Failed to load model: {e}")
         sys.exit()
 
-    print("Model loaded !")
+    print("\n" + "🌚 Model loaded !" "\n")
 
 
 # relit le fichier source pour extraire le texte exact du chunk
@@ -53,8 +54,11 @@ def read_chunk(source: MinimalSource) -> str:
         return ""
 
 
-# injecte le contenu des chunks dans le prompt
-def build_prompt(question: str, sources: List[MinimalSource]) -> str:
+# injecte le contenu des chunks dans les messages chat
+# Qwen3 est un modèle instruct/chat : il faut passer des messages formatés
+# avec le chat template, pas un prompt texte brut. Sinon le modèle continue
+# le contexte comme un document au lieu de répondre à la question.
+def build_messages(question: str, sources: List[MinimalSource]) -> list:
     # on protège la mémoire du llm = ne pas dépasser sa fenêtre de contexte
     # si on ne met pas de limite on peut avoir un llm qui hallucine
     # option : couper si on va dépasser. Le retriever classe des meilleurs
@@ -77,34 +81,49 @@ def build_prompt(question: str, sources: List[MinimalSource]) -> str:
         budget -= len(chunk_text)
 
     context = "\n\n---\n\n".join(context_parts)
+    print("\n" + " Answer ".center(70, "=") + "\n")
 
     # on dit au modèle de rester fidèle aux sources et de ne pas inventer
-    prompt = (
-        "You are a helpful assistant. "
-        "Answer the question using ONLY the provided context. "
-        "Be concise and mention the source file. \n\n"
-        f"Context:\n{context}\n\n"
-        f"Question: {question}\n\n"
-        "Answer:"
-    )
-
-    return prompt
+    # /no_think désactive le mode thinking de Qwen3 qui sinon génère des
+    # balises <think>...</think> avant de répondre
+    return [
+        {
+            "role": "system",
+            "content": (
+                "You are a helpful assistant. "
+                "Answer the question using ONLY the provided context. "
+                "Be concise and mention the source file. /no_think"
+            ),
+        },
+        {
+            "role": "user",
+            "content": f"Context:\n{context}\n\nQuestion: {question}",
+        },
+    ]
 
 
 def generate_answer(question: str, sources: List[MinimalSource]) -> str:
 
     load_llm()
 
-    prompt = build_prompt(question, sources)
+    messages = build_messages(question, sources)
 
-    # pipeline génère du texte à partir du prompt
-    # do_sample=False -> empêche IA d'être créatif dans la réponse
-    # return_full_text=False -> pipeline retourne prompt + réponse ensemble
-    #   on enlève le prompt pour garder uniquement la réponse
-    result = _cache_pipeline(prompt, max_new_tokens=256, do_sample=False,
-                             return_full_text=False)
+    # pipeline génère du texte à partir des messages
+    # on passe une liste de messages → transformers applique le chat template
+    # du modèle automatiquement
+    # GenerationConfig remplace les kwargs individuels pour éviter les
+    # conflits avec la generation_config.json embarquée dans le modèle
+    # (max_length=20, temperature, top_p, top_k incompatibles
+    # avec do_sample=False)
+    gen_cfg = GenerationConfig(max_new_tokens=256, do_sample=False)
+    result = _cache_pipeline(messages, generation_config=gen_cfg)
 
-    answer = result[0]["generated_text"].strip()
+    # avec le chat template, generated_text est une liste de messages ;
+    # le dernier est la réponse de l'assistant
+    # /no_think supprime la réflexion mais laisse des balises vides
+    # <think></think> on les retire ici
+    raw = result[0]["generated_text"][-1]["content"]
+    answer = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
 
     if not answer:
         raise ValueError("No answer could be generated from the provided"
