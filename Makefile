@@ -6,11 +6,11 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/04/24 13:54:45 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/19 11:00:38 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/19 14:09:46 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
-UV		= uv run python -m student.main
+UV		= uv run python -m student
 
 RAW_SEARCH_QUERY	= $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 RAW_ANSWER_QUERY	= $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
