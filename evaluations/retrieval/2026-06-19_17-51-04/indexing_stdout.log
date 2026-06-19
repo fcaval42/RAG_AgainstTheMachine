@@ -1,0 +1,16 @@
+
+
+-------------------------------INDEXER--------------------------------
+
+📖​ Reading files in /goinfre/fcaval/RAG_AgainstTheMachine/data/raw/vllm-0.10.1...
+     2740 files found
+     18979: Total number of chunks created
+
+🖥️​ Corpus tokenization...
+
+📚 Construction of the BM25 Index...
+     💾 BM25 index saved in /goinfre/fcaval/RAG_AgainstTheMachine/data/processed/bm25_index
+     💾 Metadata chunks saved in /goinfre/fcaval/RAG_AgainstTheMachine/data/processed/chunks/chunks.pkl
+
+Ingestion complete! The indexes have been saved to the data/processed/directory 
+

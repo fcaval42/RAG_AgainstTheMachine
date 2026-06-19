@@ -6,11 +6,11 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/04/24 13:54:45 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/19 14:09:46 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/19 18:05:53 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
-UV		= uv run python -m student
+UV		= uv run python -m student.src
 
 RAW_SEARCH_QUERY	= $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 RAW_ANSWER_QUERY	= $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
@@ -36,7 +36,17 @@ ifneq ($(filter search answer,$(firstword $(MAKECMDGOALS))),)
 	@:
 endif
 
-# ── Aide ────────────────────────────────────────────────────────────────── #
+# ── Targets obligatoires (sujet) ────────────────────────────────────────── #
+
+install :
+	uv venv .venv --python 3.10
+	uv sync
+
+run :
+	@$(UV)
+
+debug :
+	@uv run python -m pdb -m student.src
 
 all : help
 
@@ -111,16 +121,17 @@ evaluate :
 lint :
 	@echo ""
 	@echo "$(RED)TESTING FLAKE8 / MYPY...$(NC)"
-	@flake8 --exclude venv,__pycache__ .
-	@mypy . --exclude venv --warn-return-any --warn-unused-ignores \
+	@uv run flake8 --exclude venv,__pycache__ .
+	@uv run mypy . --exclude venv --cache-dir .mypy_cache \
+		--warn-return-any --warn-unused-ignores \
 		--ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 	@echo ""
 
 lint-strict :
 	@echo ""
 	@echo "$(RED)TESTING FLAKE8 / MYPY STRICT...$(NC)"
-	@flake8 . --exclude venv,__pycache__
-	@mypy . --strict --exclude venv
+	@uv run flake8 . --exclude venv,__pycache__
+	@uv run mypy . --strict --exclude venv --cache-dir .mypy_cache
 	@echo ""
 
 # ── Nettoyage ────────────────────────────────────────────────────────────── #
@@ -148,5 +159,6 @@ clean_output :
 
 fclean : clean clean_index clean_output
 
-.PHONY: all help index search answer search_dataset answer_dataset evaluate \
-        lint lint-strict clean clean_index clean_output fclean
+.PHONY: all help install run debug index search answer search_dataset \
+        answer_dataset evaluate lint lint-strict clean clean_index \
+        clean_output fclean

@@ -1,0 +1,4 @@
+
+[5m[31m[ERROR][0m Zip file not found: data/raw/vllm-0.10.1.zip
+Place the vllm-0.10.1.zip file in data/raw/
+
