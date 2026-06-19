@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/11 16:50:18 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/18 14:19:16 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/19 13:19:35 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -64,11 +64,11 @@ def extract_vllm(direction: str = "data/raw") -> str:
         raise FileNotFoundError(f"Zip file not found: {zip_path}\n"
                                 "Place the vllm-0.10.1.zip file in data/raw/")
 
-    print(f"Extraction of {zip_path}...")
+    print("\n" + f"📁​ Extraction of {zip_path}...")
     try:
         with zipfile.ZipFile(zip_path, 'r') as zf:
             zf.extractall(direction)
-        print(f"Extracted to {extracted_path}")
+        print(f"     Extracted to {extracted_path}")
     except zipfile.BadZipFile:
         print("[ERROR] The ZIP file is corrupted or invalid.")
         sys.exit()
@@ -101,10 +101,11 @@ def load_files(path_dir: str) -> List[Tuple[str, str]]:
             with open(path, 'r', encoding='utf-8', errors="ignore") as file:
                 content = file.read()
 
-            #  On construit le chemin relatif depuis la racine du projet
-            # (data/raw/...) car c'est ce que la moulinette utilise pour
-            # comparer
-            relatif_path = os.path.relpath(path)
+            # Path().rglob() retourne déjà un chemin relatif depuis la racine
+            # du projet (data/raw/...). On utilise str(path) plutôt que
+            # os.path.relpath(path) qui dépend du répertoire courant et
+            # casserait le préfixe si lancé depuis un sous-dossier.
+            relatif_path = str(path)
 
             files.append((relatif_path, content))
 
@@ -136,7 +137,7 @@ def main_indexer(path_dir: str, max_chunk_size: int) -> None:
 
     # Découpage en chunks de tous les fichiers
     all_chunks = []
-    for file_path, content in tqdm(files, desc="\nChunking"):
+    for file_path, content in tqdm(files, desc="Chunking"):
         chunks = chunk_choice(file_path, content, max_chunk_size)
         all_chunks.extend(chunks)
 
@@ -147,12 +148,13 @@ def main_indexer(path_dir: str, max_chunk_size: int) -> None:
     # stopwords="en" -> ignore mots fréquents qui servent à r (the, a, is...)
     chunks_text = [chunk[3] for chunk in all_chunks]
     print("\n🖥️​ Corpus tokenization...")
-    tokenized_text = bm25s.tokenize(chunks_text, stopwords="en")
+    tokenized_text = bm25s.tokenize(chunks_text, stopwords="en",
+                                    show_progress=False)
 
     # Construction index BM25 sur texte tokenisé et nettoyé
     print("\n📚 Construction of the BM25 Index...")
     retriever = bm25s.BM25()
-    retriever.index(tokenized_text)
+    retriever.index(tokenized_text, show_progress=False)
 
     # sauvegarde de l'index BM25 sur disque (pour pouvoir le recharger sans
     # recalculer)

@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/16 11:15:18 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/18 14:54:55 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/19 11:36:35 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -81,7 +81,6 @@ def build_messages(question: str, sources: List[MinimalSource]) -> list:
         budget -= len(chunk_text)
 
     context = "\n\n---\n\n".join(context_parts)
-    print("\n" + " Answer ".center(70, "=") + "\n")
 
     # on dit au modèle de rester fidèle aux sources et de ne pas inventer
     # /no_think désactive le mode thinking de Qwen3 qui sinon génère des

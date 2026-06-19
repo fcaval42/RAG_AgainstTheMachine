@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/08 14:35:44 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/16 17:42:54 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/19 13:44:41 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -167,21 +167,3 @@ def chunk_choice(file_path: str, content: str, max_size: int) -> List[Chunk]:
     # print("\n\nJE PASSE ICI : TEXT\n\n")
     return chunk_text(file_path, content, max_size)
 
-
-# def main():
-#    with open("testerpy.py", "r") as f:
-#        PYTHON_SAMPLE = f.read()
-
-#    with open("tester.txt", "r") as f:
-#        MARKDOWN_SAMPLE = f.read()
-
-#    #liste = chunk_choice("testerpy.py", PYTHON_SAMPLE, 2000)
-#    liste2 = chunk_choice("tester.txt", MARKDOWN_SAMPLE, 2000)
-
-#    #for lst in liste:
-#    #    print(f"\n\n{lst}\n\n")
-
-#    for lste in liste2:
-#        print(f"\n\n{lste}\n\n")
-
-# main()

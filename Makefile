@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/04/24 13:54:45 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/18 14:24:28 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/19 11:00:38 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -21,7 +21,7 @@ DATASET		= datasets_public/public/UnansweredQuestions/dataset_docs_public.json
 GT_DATASET	= datasets_public/public/AnsweredQuestions/dataset_docs_public.json
 SEARCH_OUT	= data/output/search_results
 ANSWER_OUT	= data/output/search_results_and_answer
-REPO		= vllm-0.10.1
+REPO		= data/raw/vllm-0.10.1
 K		= 10
 
 RED		= \033[0;31m
