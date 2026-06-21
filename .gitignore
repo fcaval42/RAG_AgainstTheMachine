@@ -1,0 +1,6 @@
+*.pdf
+__pycache__
+*.txt
+.venv
+.mypy_cache
+.vscode

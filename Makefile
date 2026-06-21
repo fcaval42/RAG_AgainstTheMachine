@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/04/24 13:54:45 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/19 18:05:53 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/21 17:37:22 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -36,16 +36,22 @@ ifneq ($(filter search answer,$(firstword $(MAKECMDGOALS))),)
 	@:
 endif
 
+check-venv :
+	@test -d .venv || (echo "" && \
+		echo "$(RED)ERREUR : venv introuvable.$(NC)" && \
+		echo "$(YELLOW)Lance d'abord :$(NC) make install" && \
+		echo "" && exit 1)
+
 # ── Targets obligatoires (sujet) ────────────────────────────────────────── #
 
 install :
 	uv venv .venv --python 3.10
 	uv sync
 
-run :
+run : check-venv
 	@$(UV)
 
-debug :
+debug : check-venv
 	@uv run python -m pdb -m student.src
 
 all : help
@@ -56,51 +62,51 @@ help :
 	@echo "$(BLUE)║              RAG — commandes Make            ║$(NC)"
 	@echo "$(BLUE)╚══════════════════════════════════════════════╝$(NC)"
 	@echo ""
-	@echo "  $(GREEN)make index$(NC)              Indexe le repo vLLM (BM25)"
-	@echo "  $(GREEN)make search Q=\"...\"$(NC)    Teste le retriever sur une question"
-	@echo "  $(GREEN)make answer Q=\"...\"$(NC)    Chaîne RAG complète sur une question"
-	@echo "  $(GREEN)make search_dataset$(NC)     Recherche sur tout le dataset"
-	@echo "  $(GREEN)make answer_dataset$(NC)     Génère les réponses LLM pour le dataset"
-	@echo "  $(GREEN)make evaluate$(NC)           Calcule le Recall@k"
+	@echo "  $(GREEN)make $(NC)                   Install dependencies"
+	@echo "  $(GREEN)make index$(NC)              Index the vLLM (BM25) repository"
+	@echo "  $(GREEN)make search Q=\"...\"$(NC)   Test the retriever on a question"
+	@echo "  $(GREEN)make answer Q=\"...\"$(NC)   Complete RAG chain for a given question"
+	@echo "  $(GREEN)make search_dataset$(NC)     Search the entire dataset"
+	@echo "  $(GREEN)make answer_dataset$(NC)     Generates LLM responses for the dataset"
+	@echo "  $(GREEN)make evaluate$(NC)           Calculate Recall@k"
 	@echo ""
 	@echo "  $(YELLOW)make lint$(NC)               Flake8 + mypy"
-	@echo "  $(YELLOW)make lint-strict$(NC)        Mypy strict"
-	@echo "  $(YELLOW)make clean$(NC)              Supprime caches Python"
-	@echo "  $(YELLOW)make clean_index$(NC)        Supprime l'index BM25"
-	@echo "  $(YELLOW)make clean_output$(NC)       Supprime les fichiers de sortie"
-	@echo "  $(YELLOW)make fclean$(NC)             Tout nettoyer"
+	@echo "  $(YELLOW)make clean$(NC)              Clears Python caches"
+	@echo "  $(YELLOW)make clean_index$(NC)        Deletes the BM25 index"
+	@echo "  $(YELLOW)make clean_output$(NC)       Deletes the output files"
+	@echo "  $(YELLOW)make fclean$(NC)             Clean everything"
 	@echo ""
 
 # ── Pipeline RAG ────────────────────────────────────────────────────────── #
 
-index :
+index : check-venv
 	@echo ""
 	@echo "$(YELLOW)INDEXATION EN COURS...$(NC)"
 	@$(UV) index --repo_path=$(REPO)
 	@echo "$(GREEN)INDEX OK$(NC)"
 
 # make search Q="What is vLLM ?"
-search :
+search : check-venv
 	@QUERY="$(strip $(if $(Q),$(Q),$(RAW_SEARCH_QUERY)))"; \
 	echo ""; \
 	echo "$(BLUE)SEARCH : $$QUERY$(NC)"; \
 	$(UV) search --request="$$QUERY" --k=$(K)
 
 # make answer Q="What is vLLM ?"
-answer :
+answer : check-venv
 	@QUERY="$(strip $(if $(Q),$(Q),$(RAW_ANSWER_QUERY)))"; \
 	echo ""; \
 	echo "$(BLUE)ANSWER : $$QUERY$(NC)"; \
 	$(UV) answer --request="$$QUERY" --k=$(K)
 
-search_dataset :
+search_dataset : check-venv
 	@echo ""
 	@echo "$(YELLOW)SEARCH DATASET : $(DATASET)$(NC)"
 	@$(UV) search_dataset --dataset_path=$(DATASET) --k=$(K) \
 		--save_directory=$(SEARCH_OUT)
 	@echo "$(GREEN)SEARCH DATASET OK$(NC)"
 
-answer_dataset :
+answer_dataset : check-venv
 	@echo ""
 	@echo "$(YELLOW)ANSWER DATASET...$(NC)"
 	@$(UV) answer_dataset \
@@ -108,7 +114,7 @@ answer_dataset :
 		--save_directory=$(ANSWER_OUT)
 	@echo "$(GREEN)ANSWER DATASET OK$(NC)"
 
-evaluate :
+evaluate : check-venv
 	@echo ""
 	@echo "$(PINK)EVALUATION RECALL@K...$(NC)"
 	@$(UV) evaluate \
@@ -118,20 +124,13 @@ evaluate :
 
 # ── Qualité du code ──────────────────────────────────────────────────────── #
 
-lint :
+lint : check-venv
 	@echo ""
 	@echo "$(RED)TESTING FLAKE8 / MYPY...$(NC)"
-	@uv run flake8 --exclude venv,__pycache__ .
-	@uv run mypy . --exclude venv --cache-dir .mypy_cache \
+	@uv run flake8 student/
+	@uv run mypy student/ --cache-dir .mypy_cache \
 		--warn-return-any --warn-unused-ignores \
 		--ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
-	@echo ""
-
-lint-strict :
-	@echo ""
-	@echo "$(RED)TESTING FLAKE8 / MYPY STRICT...$(NC)"
-	@uv run flake8 . --exclude venv,__pycache__
-	@uv run mypy . --strict --exclude venv --cache-dir .mypy_cache
 	@echo ""
 
 # ── Nettoyage ────────────────────────────────────────────────────────────── #
@@ -160,5 +159,5 @@ clean_output :
 fclean : clean clean_index clean_output
 
 .PHONY: all help install run debug index search answer search_dataset \
-        answer_dataset evaluate lint lint-strict clean clean_index \
-        clean_output fclean
+        answer_dataset evaluate lint clean clean_index \
+        clean_output fclean check-venv

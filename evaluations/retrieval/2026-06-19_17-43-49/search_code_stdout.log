@@ -1,4 +1,0 @@
-
-[5m[31m[ERROR][0mIndex BM25 not found. First run:
-  uv run python -m student index
-

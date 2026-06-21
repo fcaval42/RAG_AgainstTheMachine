@@ -6,19 +6,19 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/16 11:15:18 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/19 15:53:27 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/21 17:30:45 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
 import re
 import sys
-from typing import List
+from typing import Any, List, Optional
 from transformers import pipeline, GenerationConfig
 from .structure import MinimalSource
 
 # on garde le modèle en mémoire entre les appels pour éviter de recharger
 # à chaque fois (voir principe singleton)
-_cache_pipeline = None
+_cache_pipeline: Optional[Any] = None
 
 
 # charge modèle llm si pas encore chargé
@@ -115,7 +115,8 @@ def generate_answer(question: str, sources: List[MinimalSource]) -> str:
     # (max_length=20, temperature, top_p, top_k incompatibles
     # avec do_sample=False)
     gen_cfg = GenerationConfig(max_new_tokens=256, do_sample=False)
-    result = _cache_pipeline(messages, generation_config=gen_cfg)
+    result = _cache_pipeline(  # type: ignore[misc]
+        messages, generation_config=gen_cfg)
 
     # avec le chat template, generated_text est une liste de messages ;
     # le dernier est la réponse de l'assistant

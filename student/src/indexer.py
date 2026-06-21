@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/11 16:50:18 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/19 14:37:31 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/21 16:28:23 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -31,7 +31,8 @@ _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 #  Chemins de sauvegarde de l'index demandé par le sujet
 INDEX_DIR = str(_PROJECT_ROOT / "data" / "processed")
 BM25_PATH = str(_PROJECT_ROOT / "data" / "processed" / "bm25_index")
-CHUNKS_PATH = str(_PROJECT_ROOT / "data" / "processed" / "chunks" / "chunks.pkl")
+CHUNKS_PATH = str(_PROJECT_ROOT / "data" / "processed" / "chunks" /
+                  "chunks.pkl")
 
 
 # Charge index BM25 et métadonnées depuis le disque
@@ -115,7 +116,7 @@ def load_files(path_dir: str) -> List[Tuple[str, str]]:
             files.append((relatif_path, content))
 
         except Exception as e:
-            print(f"[ERROR] Unreadable {relatif_path}: {e}")
+            print(f"[ERROR] Unreadable {path_dir}: {e}")
             sys.exit()
 
     return files

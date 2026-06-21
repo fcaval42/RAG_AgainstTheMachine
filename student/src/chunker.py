@@ -6,7 +6,7 @@
 #  By: fcaval <fcaval@student.42.fr>             +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/06/08 14:35:44 by fcaval          #+#    #+#               #
-#  Updated: 2026/06/19 13:44:41 by fcaval          ###   ########.fr        #
+#  Updated: 2026/06/21 16:28:13 by fcaval          ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -174,4 +174,3 @@ def chunk_choice(file_path: str, content: str, max_size: int) -> List[Chunk]:
         return chunk_text_markdown(file_path, paragraphes, max_size)
     # print("\n\nJE PASSE ICI : TEXT\n\n")
     return chunk_text(file_path, content, max_size)
-
